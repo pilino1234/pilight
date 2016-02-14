@@ -17,7 +17,7 @@
 */
 
 #include <stdio.h>
-#include <stdlid.h>
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
@@ -31,10 +31,10 @@
 #include "elro_fa20rf.h"
 
 #define PULSE_MULTIPLIER	2
-#define MIN_PULSE_LENGTH	//TODO
-#define MAX_PULSE_LENGTH	//TODO
+#define MIN_PULSE_LENGTH	350 //TODO
+#define MAX_PULSE_LENGTH	400 //TODO
 #define AVG_PULSE_LENGTH	393
-#define RAW_LENGTH				52
+#define RAW_LENGTH			52
 
 static int validate(void) {
 	if(elro_fa20rf->rawlen == RAW_LENGTH) {
@@ -43,13 +43,13 @@ static int validate(void) {
 			return 0;
 		}
 	}
-	
 	return -1;
 }
 
 static void createMessage(int unitcode, int state) {
 	elro_fa20rf->message = json_mkobject();
-	json_append_member(elro_fa20rf->message, "unitcode", json_kmunmber(unitcode, 0));
+	json_append_member(elro_fa20rf->message, "unitcode", json_mknumber(unitcode, 0));
+	
 	if(state == 0) {
 		json_append_member(elro_fa20rf->message, "state", json_mkstring("opened"));	
 	} else {
@@ -62,9 +62,9 @@ static void parseCode(void) {
 	
 	for(x=2; x<elro_fa20rf->rawlen; x+=2) {
 		if(elro_fa20rf->raw[x+1] > (int)((double)AVG_PULSE_LENGTH*((double)PULSE_MULTIPLIER/2))) {
-			binary[i++] = 1;
+			binary[x++] = 1;
 		} else {
-			binary[i++] = 0;
+			binary[x++] = 0;
 		}
 	}
 	
@@ -76,9 +76,9 @@ static void parseCode(void) {
 static void createLow(int s, int e) {
 	int i;
 	
-	for(i=s,i<=e;i+=2) {
-		elro_fa20rf->raw[i]=(2*AVG_PULSE_LENGTH);
-		elro_fa20rf->raw[i+1]=(2*PULSE_MULTIPLIER*AVG_PULSE_LENGTH);
+	for(i=s;i<=e;i+=2) {
+		elro_fa20rf->raw[i]=(2 * AVG_PULSE_LENGTH);
+		elro_fa20rf->raw[i+1]=(2 * PULSE_MULTIPLIER * AVG_PULSE_LENGTH);
 	}
 }
 
@@ -150,15 +150,14 @@ static int createCode(struct JsonNode *code) {
 		createHeader();
 		createUnitCode(unitcode);
 		createState(state);
-		createFooter;
+		createFooter();
 	}
 	return EXIT_SUCCESS;
 }
 
 static void printHelp(void) {
 	printf("\t -u --unitcode=unitcode\t\tcontrol a device with this unitcode\n");
-	printf("\t -t --opened\t\t\tsend an opened signal\n");
-	printf("\t -f --closed\t\t\tsend a closed signal\n");
+	printf("\t -t --alarm\t\t\tsend an alarm\n");
 }
 
 #if !defined(MODULE) && !defined(_WIN32)
@@ -174,15 +173,16 @@ void elro_fa20rfInit() {
 	elro_fa20rf->hwtype = RF433;
 	elro_fa20rf->minrawlen = RAW_LENGTH;
 	elro_fa20rf->maxrawlen = RAW_LENGTH;
-	elro_fa20rf->maxgaplen = //TODO: MAX_PULSE_LEN*PULSE_DIV;
-	elro_fa20rf->mingaplen = //TODO: MIN_PULSE_LEN*PULSE_DIV;
+//	elro_fa20rf->maxgaplen = TODO: MAX_PULSE_LEN*PULSE_DIV;
+//	elro_fa20rf->mingaplen = TODO: MIN_PULSE_LEN*PULSE_DIV;
 	
 	options_add(&elro_fa20rf->options, 'u', "unitcode", OPTION_HAS_VALUE, DEVICES_ID, JSON_NUMBER, NULL, "^(3[012]?|[012][0-9]|[0-9]{1})$");
-	options_add(&elro_fa20rf->options, 't', "opened", OPTION_NO_VALUE, DEVICES_STATE, JSON_STRING, NULL, NULL);
-	options_add(&elro_fa20rf->options, 'f', "closed", OPTION_NO_VALUE, DEVICES_STATE, JSON_STRING, NULL, NULL);
+	options_add(&elro_fa20rf->options, 't', "alarm", OPTION_NO_VALUE, DEVICES_STATE, JSON_STRING, NULL, NULL);
 	
 	elro_fa20rf->parseCode=&parseCode;
 	elro_fa20rf->validate=&validate;
+	elro_fa20rf->createCode=&createCode;
+	elro_fa20rf->printHelp=&printHelp;
 }
 
 #if defined(MODULE) && !defined(_WIN32)

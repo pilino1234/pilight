@@ -87,6 +87,7 @@ endif()
 if(${PROTOCOL_ELRO_SMOKEDETECTOR} MATCHES "OFF")
 	list(REMOVE_ITEM ${PROJECT_NAME}_sources "${PROJECT_SOURCE_DIR}/elro_fa20rf.c")
 	list(REMOVE_ITEM ${PROJECT_NAME}_headers "${PROJECT_SOURCE_DIR}/elro_fa20rf.h")
+endif()
 
 if(${PROTOCOL_IMPULS} MATCHES "OFF")
 	list(REMOVE_ITEM ${PROJECT_NAME}_sources "${PROJECT_SOURCE_DIR}/impuls.c")
