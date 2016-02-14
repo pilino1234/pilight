@@ -169,7 +169,7 @@ void elro_fa20rfInit() {
 	protocol_register(&elro_fa20rf);
 	protocol_set_id(elro_fa20rf, "elro_fa20rf");
 	protocol_device_add(elro_fa20rf, "elro_fa20rf", "Elro FA20RF Smoke Detector");
-	elro_fa20rf->devtype = CONTACT;
+	elro_fa20rf->devtype = ALARM;
 	elro_fa20rf->hwtype = RF433;
 	elro_fa20rf->minrawlen = RAW_LENGTH;
 	elro_fa20rf->maxrawlen = RAW_LENGTH;
