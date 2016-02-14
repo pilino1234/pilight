@@ -190,7 +190,7 @@ void compatibility(struct module_t *module) {
 	module->name = "elro_fa20rf";
 	module->version = "0.1";
 	module->reqversion = "7.0";
-	module->reqcommit = "" //TODO
+	module->reqcommit = "89"
 }
 
 void init(void) {
