@@ -6,7 +6,6 @@ libs/webgui
 inc/valgrind
 inc/i2c-dev.h
 control.c
-daemon.c
 debug.c
 flash.c
 raw.c
