@@ -12,8 +12,6 @@ flash.c
 raw.c
 receive.c
 send.c
-sha256.c
-uuid.c
 tests
 libs/pilight/core
 libs/pilight/events
